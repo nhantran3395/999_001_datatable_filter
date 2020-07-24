@@ -65,7 +65,7 @@ function App() {
       />
       <MDataTable
         data={searchData(data)}
-        toHighlight={queryTerm}
+        queryTerm={queryTerm}
         columnsToSearch={columnsToSearch}
       />
     </div>

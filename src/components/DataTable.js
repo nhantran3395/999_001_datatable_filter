@@ -1,7 +1,7 @@
 import React from "react";
 import { Highlight } from "../utils/Highlight";
 
-const DataTable = ({ data, toHighlight, columnsToSearch }) => {
+const DataTable = ({ data, queryTerm, columnsToSearch }) => {
   const columns = data[0] && Object.keys(data[0]);
   console.log(`[DataTable] is running`);
 
@@ -24,7 +24,7 @@ const DataTable = ({ data, toHighlight, columnsToSearch }) => {
                   {columns.map((column) => {
                     if (!columnsToSearch.includes(column)) {
                       return (
-                        <td>
+                        <td key={`${index}-${column}`}>
                           <span>{row[column]}</span>
                         </td>
                       );
@@ -34,7 +34,7 @@ const DataTable = ({ data, toHighlight, columnsToSearch }) => {
                       <td key={`${index}-${column}`}>
                         <Highlight
                           text={row[column].toString()}
-                          highlight={toHighlight}
+                          highlight={queryTerm}
                         />
                       </td>
                     );
@@ -49,13 +49,21 @@ const DataTable = ({ data, toHighlight, columnsToSearch }) => {
 };
 
 const DataTableNotUpdated = (prevDataTable, nextDataTable) => {
+  // when columnsToSearch is altered but queryTerm is null,
+  // forcily block DataTable from rerendering.
+
   if (
-    !prevDataTable.toHighlight &&
-    prevDataTable.columnsToSearch === nextDataTable.columnsToSearch
+    !prevDataTable.queryTerm &&
+    prevDataTable.data === nextDataTable.data &&
+    prevDataTable.columnsToSearch !== nextDataTable.columnsToSearch
   ) {
-    return false;
+    return true;
   }
-  return prevDataTable.toHighlight === nextDataTable.toHighlight;
+
+  return (
+    prevDataTable.data === nextDataTable.data &&
+    prevDataTable.columnsToSearch === nextDataTable.columnsToSearch
+  );
 };
 
 const MDataTable = React.memo(DataTable, DataTableNotUpdated);
