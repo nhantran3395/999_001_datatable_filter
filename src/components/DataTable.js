@@ -53,9 +53,8 @@ const DataTableNotUpdated = (prevDataTable, nextDataTable) => {
   // forcily block DataTable from rerendering.
 
   if (
-    !prevDataTable.queryTerm &&
-    prevDataTable.data === nextDataTable.data &&
-    prevDataTable.columnsToSearch !== nextDataTable.columnsToSearch
+    !nextDataTable.queryTerm &&
+    !(prevDataTable.columnsToSearch === nextDataTable.columnsToSearch)
   ) {
     return true;
   }
