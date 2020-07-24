@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import { DataTable } from "./components/DataTable";
+import { MDataTable } from "./components/DataTable";
+import { MColumnsToSearchCheckBox } from "./components/SearchColumnCheckBoxs";
 
 function App() {
   const [data, setData] = useState([]);
   const [queryTerm, setQueryTerm] = useState("");
-  const [searchColumns, setSearchColumns] = useState(["firstName", "lastName"]);
-
-  const columns = data[0] ? Object.keys(data[0]) : null;
+  const [columnsToSearch, setColumnsToSearch] = useState([
+    "firstName",
+    "lastName",
+  ]);
 
   const url =
     "https://devmentor.live/api/examples/contacts.json?api_key=70c676c1";
@@ -16,17 +18,19 @@ function App() {
     setQueryTerm(event.target.value);
   };
 
-  const handleUpdateSearchColumns = (event) => {
+  const handleUpdateColumnsToSearch = (event) => {
     const column = event.target.id;
-    const isChecked = searchColumns.includes(column);
-    setSearchColumns((prev) =>
+    const isChecked = columnsToSearch.includes(column);
+    setColumnsToSearch((prev) =>
       isChecked ? prev.filter((sc) => sc !== column) : [...prev, column]
     );
   };
 
+  const columns = data[0] ? Object.keys(data[0]) : null;
+
   const searchData = (rows) => {
     return rows.filter((row) =>
-      searchColumns.some(
+      columnsToSearch.some(
         (column) =>
           row[column]
             .toString()
@@ -36,40 +40,34 @@ function App() {
     );
   };
 
-  useEffect(async () => {
-    const response = await fetch(url);
-    const jsonData = await response.json();
-    setData(jsonData);
+  useEffect(() => {
+    async function fetchUserData() {
+      const response = await fetch(url);
+      const jsonData = await response.json();
+      setData(jsonData);
+    }
+
+    fetchUserData();
   }, []);
 
   return (
     <div className="App">
-      <h1>
-        Sample <mark>user</mark> data
-      </h1>
+      <h1>Sample user data</h1>
       <input
         type="search"
         placeholder="search for first name, last name, email, address, etc."
         onChange={handleUpdateQueryTerm}
       />
-      {columns
-        ? columns.map((column, index) => {
-            return (
-              <div>
-                <input
-                  type="checkbox"
-                  key={index}
-                  id={column}
-                  name={column}
-                  checked={searchColumns.includes(column)}
-                  onChange={handleUpdateSearchColumns}
-                />
-                <label for={column}>{column}</label>
-              </div>
-            );
-          })
-        : () => {}}
-      <DataTable data={searchData(data)} />
+      <MColumnsToSearchCheckBox
+        columns={columns}
+        checkedColumns={columnsToSearch}
+        handleUpdateColumnsToSearch={handleUpdateColumnsToSearch}
+      />
+      <MDataTable
+        data={searchData(data)}
+        toHighlight={queryTerm}
+        columnsToSearch={columnsToSearch}
+      />
     </div>
   );
 }

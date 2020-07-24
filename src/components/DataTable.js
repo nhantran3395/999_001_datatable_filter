@@ -1,15 +1,17 @@
 import React from "react";
+import { Highlight } from "../utils/Highlight";
 
-const DataTable = ({ data }) => {
-  const headers = data[0] && Object.keys(data[0]);
+const DataTable = ({ data, toHighlight, searchColumns }) => {
+  const columns = data[0] && Object.keys(data[0]);
+  console.log(`[DataTable] is running`);
 
   return (
     <table>
       <thead>
         <tr>
-          {headers
-            ? headers.map((header, index) => {
-                return <th key={index}>{header}</th>;
+          {columns
+            ? columns.map((column, index) => {
+                return <th key={index}>{column}</th>;
               })
             : () => {}}
         </tr>
@@ -19,8 +21,15 @@ const DataTable = ({ data }) => {
           ? data.map((row, index) => {
               return (
                 <tr key={index}>
-                  {headers.map((header) => {
-                    return <td key={`${index}-${header}`}>{row[header]}</td>;
+                  {columns.map((column) => {
+                    return (
+                      <td key={`${index}-${column}`}>
+                        <Highlight
+                          text={row[column].toString()}
+                          highlight={toHighlight}
+                        />
+                      </td>
+                    );
                   })}
                 </tr>
               );
@@ -31,4 +40,16 @@ const DataTable = ({ data }) => {
   );
 };
 
-export { DataTable };
+const DataTableNotUpdated = (prevDataTable, nextDataTable) => {
+  if (
+    !prevDataTable.toHighlight &&
+    prevDataTable.columnsToSearch === nextDataTable.columnsToSearch
+  ) {
+    return false;
+  }
+  return prevDataTable.toHighlight === nextDataTable.toHighlight;
+};
+
+const MDataTable = React.memo(DataTable, DataTableNotUpdated);
+
+export { MDataTable };
