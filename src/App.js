@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import "./App.css";
+import React, { useState, useEffect, useMemo } from "react";
 import { MDataTable } from "./components/DataTable";
 import { MColumnsToSearchCheckBox } from "./components/SearchColumnCheckBoxs";
 
@@ -13,6 +12,16 @@ function App() {
 
   const url =
     "https://devmentor.live/api/examples/contacts.json?api_key=70c676c1";
+
+  useEffect(() => {
+    async function fetchUserData() {
+      const response = await fetch(url);
+      const jsonData = await response.json();
+      setData(jsonData);
+    }
+
+    fetchUserData();
+  }, []);
 
   const handleUpdateQueryTerm = (event) => {
     setQueryTerm(event.target.value);
@@ -29,7 +38,8 @@ function App() {
   const columns = data[0] ? Object.keys(data[0]) : null;
 
   const searchData = (rows) => {
-    return rows.filter((row) =>
+    console.log(`[searchData function is triggered]`);
+    return data.filter((row) =>
       columnsToSearch.some(
         (column) =>
           row[column]
@@ -39,16 +49,6 @@ function App() {
       )
     );
   };
-
-  useEffect(() => {
-    async function fetchUserData() {
-      const response = await fetch(url);
-      const jsonData = await response.json();
-      setData(jsonData);
-    }
-
-    fetchUserData();
-  }, []);
 
   return (
     <div className="App">
