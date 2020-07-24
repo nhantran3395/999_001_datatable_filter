@@ -1,7 +1,7 @@
 import React from "react";
 import { Highlight } from "../utils/Highlight";
 
-const DataTable = ({ data, toHighlight, searchColumns }) => {
+const DataTable = ({ data, toHighlight, columnsToSearch }) => {
   const columns = data[0] && Object.keys(data[0]);
   console.log(`[DataTable] is running`);
 
@@ -22,6 +22,14 @@ const DataTable = ({ data, toHighlight, searchColumns }) => {
               return (
                 <tr key={index}>
                   {columns.map((column) => {
+                    if (!columnsToSearch.includes(column)) {
+                      return (
+                        <td>
+                          <span>{row[column]}</span>
+                        </td>
+                      );
+                    }
+
                     return (
                       <td key={`${index}-${column}`}>
                         <Highlight
